@@ -165,8 +165,8 @@ pub struct Configuration {
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default)]
 #[serde(rename_all = "lowercase")]
 pub enum MomentumOutputSetting {
-    #[default]
     Fingers,
+    #[default]
     Wheel,
 }
 
@@ -230,7 +230,7 @@ impl Default for Configuration {
             momentum_stop_speed: Momentum::MAC_STOP_SPEED * 1000.0,
             momentum_min_speed: Momentum::DEFAULT_MIN_SPEED * 1000.0,
             momentum_stop_hold: Momentum::DEFAULT_STOP_HOLD,
-            momentum_output: MomentumOutputSetting::Fingers,
+            momentum_output: MomentumOutputSetting::Wheel,
             momentum_wheel_gain: Momentum::DEFAULT_WHEEL_GAIN,
             momentum_wheel_invert: false,
         }
@@ -495,14 +495,14 @@ mod tests {
     }
 
     #[test]
-    fn momentum_output_defaults_to_fingers() {
+    fn momentum_output_defaults_to_wheel() {
         let cfg = parse("{}");
         let m = cfg.timing().momentum.expect("momentum on by default");
-        assert_eq!(m.output, MomentumOutput::Fingers);
+        assert_eq!(m.output, MomentumOutput::Wheel);
         assert_eq!(m.wheel_gain, Momentum::DEFAULT_WHEEL_GAIN);
         assert!(!m.wheel_invert);
-        assert!(!cfg.wants_wheel_device());
-        assert_eq!(Configuration::default().momentum_output, MomentumOutputSetting::Fingers);
+        assert!(cfg.wants_wheel_device());
+        assert_eq!(Configuration::default().momentum_output, MomentumOutputSetting::Wheel);
     }
 
     #[test]

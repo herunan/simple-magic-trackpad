@@ -159,16 +159,18 @@ tests in `gesture/tests.rs`, plus `randomized_flick_invariants` (24,000 flick ro
 with touch-to-stop, taps, drags and resyncs, checking the clone never desyncs or keeps
 a phantom touch).
 
-**Wheel output (prototype, off by default).** The glide fingers are "still down", so
+**Wheel output (the default).** The glide fingers described above are "still down", so
 Zen/Firefox keep a page stretched at its limit (overscroll) until the glide ends.
 `"momentumOutput": "wheel"` relays the lift at once and runs the same glide as
 high-resolution wheel events on a separate device, "Momentum wheel (created by
-mac-trackpad)" (created when this is set; the drag pointer is left as it was).
+mac-trackpad)" (the drag pointer is left as it was). `"momentumOutput": "fingers"` is the
+older synthetic-finger glide above.
 libinput's scroll curve doesn't apply to wheel events, so finger travel is converted
 linearly: `momentumWheelGain` (24 = one notch per 5 mm of finger glide, about the Mac
 distance in KDE apps at ~60 px per notch; the real scale depends on each app).
-The direction assumes natural scrolling on the touchpad and not on the new device;
-`momentumWheelInvert` (or that device's own natural-scrolling switch) flips it. A touch
+**The direction assumes natural scrolling on the touchpad** (the Mac default) and not on
+the new device. With natural scrolling off, the glide runs the wrong way: turn natural
+scrolling on, or set `"momentumWheelInvert": true`. A touch
 stops the glide at once (no hold). Known risk: with the lift visible, GTK, Firefox and
 Chromium may start their own fling as well; the wheel events should cancel it, but
 look for a kick or a doubled glide at the lift. Tests: the `wheel_*` tests and the
@@ -269,6 +271,13 @@ the plugin (`manifest.json`, `omarchy/BarWidget.qml`, `omarchy/Panel.qml`,
 > Hyprland; the daemon has never run under Hyprland; the install steps below have not
 > been run on Omarchy. What is said here about Hyprland and Omarchy comes from their
 > source code. The KWin path is the one in use.
+
+### Natural scrolling
+
+Omarchy ships with touchpad `natural_scroll = false`, but the glide assumes it's on, like
+a Mac. Set `natural_scroll = true` in `~/.config/hypr/input.lua` to scroll like a Mac, or
+keep it off and add `"momentumWheelInvert": true` to `~/.config/mac-trackpad/daemon.json`.
+Otherwise the glide runs opposite to your fingers.
 
 ### What it needs
 

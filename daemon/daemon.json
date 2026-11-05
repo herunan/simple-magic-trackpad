@@ -8,5 +8,5 @@
     "pressGrace": 75,
     "threeFingerDrag": false,
     "momentum": true,
-    "momentumOutput": "fingers"
+    "momentumOutput": "wheel"
 }

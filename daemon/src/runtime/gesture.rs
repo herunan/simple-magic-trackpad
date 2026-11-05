@@ -53,7 +53,7 @@
 //! stop speed (Mac: 1.905 mm/s). The steeper decay at low speed is what
 //! makes slow flicks fade out quickly and smoothly instead of trailing.
 //!
-//! ## Wheel output (`MomentumOutput::Wheel`, off by default)
+//! ## Wheel output (`MomentumOutput::Wheel`, the configuration default)
 //!
 //! macOS keeps the momentum phase apart from the finger phase; Wayland
 //! has no momentum phase, and glide fingers that are "still down" keep
