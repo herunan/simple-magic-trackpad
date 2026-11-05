@@ -1,0 +1,5 @@
+# Start the mac-trackpad user service whenever a touchpad appears (boot,
+# Bluetooth reconnect, resume). Matches the generic touchpad property, not
+# a device path: Bluetooth trackpads get a new uhid instance path on every
+# reconnect. A start while it's already running is a no-op.
+ACTION=="add", SUBSYSTEM=="input", ENV{ID_INPUT_TOUCHPAD}=="1", RUN+="/usr/bin/systemctl --user --machine=@USER@@ start mac-trackpad.service"

@@ -1,0 +1,70 @@
+#!/bin/sh
+# mac-trackpad-accel: tune the Mac curve live.
+#   mac-trackpad-accel set [mac_curves.py options]   regenerate + reload
+#   mac-trackpad-accel reload                        re-apply accel.conf
+#   mac-trackpad-accel status                        is KWin using it?
+set -eu
+CONF="${XDG_CONFIG_HOME:-$HOME/.config}/mac-trackpad/accel.conf"
+# mac_curves.py: where accel/install.sh put it, else next to this script.
+DATA="${XDG_DATA_HOME:-$HOME/.local/share}/mac-trackpad"
+GEN="$DATA/mac_curves.py"
+[ -f "$GEN" ] || GEN="$(dirname "$(readlink -f "$0")")/mac_curves.py"
+
+# KWin re-sets the profile when this property is written, which makes the
+# shim re-read accel.conf. Every "Apple Inc. Magic Trackpad" KWin knows
+# (the grabbed real one and the three-finger-drag clone) gets it.
+reload() {
+    for obj in $(busctl --user tree org.kde.KWin --list | grep '/InputDevice/event'); do
+        n=$(busctl --user get-property org.kde.KWin "$obj" org.kde.KWin.InputDevice name)
+        case "$n" in *"Magic Trackpad"*)
+            busctl --user set-property org.kde.KWin "$obj" org.kde.KWin.InputDevice \
+                pointerAccelerationProfileAdaptive b true ;;
+        esac
+    done
+}
+
+# Hyprland needs no shim: mac_hyprland.py writes the curve into Hyprland's
+# own per-device config (Omarchy's Lua toggles, or a hyprlang file to source)
+# and applies it live with hyprctl. Hyprland's scroll factor is set to 1 for
+# the trackpad there, so the curve isn't divided by KWin's 1.4. Chosen at run
+# time; on KDE everything below this block runs as before.
+is_hyprland() {
+    [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ] && return 0
+    case "$(printf '%s' "${XDG_CURRENT_DESKTOP:-}" | tr '[:upper:]' '[:lower:]')" in
+        *hyprland*) return 0 ;;
+    esac
+    return 1
+}
+if is_hyprland; then
+    HYPR="$DATA/mac_hyprland.py"
+    [ -f "$HYPR" ] || HYPR="$(dirname "$(readlink -f "$0")")/mac_hyprland.py"
+    case "${1:-}" in
+        set) shift
+             mkdir -p "$(dirname "$CONF")"
+             # the last --kwin-scroll-factor wins in argparse
+             python3 "$GEN" "$@" --kwin-scroll-factor 1 > "$CONF.new" || { rm -f "$CONF.new"; exit 1; }
+             mv "$CONF.new" "$CONF"
+             python3 "$HYPR" apply "$CONF"
+             grep '^#' "$CONF"
+             exit 0 ;;
+        reload) exec python3 "$HYPR" apply "$CONF" ;;
+        status) exec python3 "$HYPR" status "$CONF" ;;
+    esac
+fi
+
+case "${1:-}" in
+    set) shift; python3 "$GEN" "$@" > "$CONF.new" && mv "$CONF.new" "$CONF"; reload
+         grep '^#' "$CONF" ;;
+    reload) reload ;;
+    status)
+        # /proc/<kwin>/maps isn't readable (file caps make KWin non-dumpable),
+        # so go by what the shim logged since KWin last started.
+        since=$(systemctl --user show plasma-kwin_wayland.service -p ActiveEnterTimestamp --value)
+        out=$(journalctl --user --no-pager --since "$since" -g mac-accel-shim 2>/dev/null | grep -v '^-- ' || true)
+        if [ -n "$out" ]; then
+            echo "$out" | tail -3
+        else
+            echo "KWin is not using the shim (not installed, not re-logged in, or no Magic Trackpad seen)"
+        fi ;;
+    *) sed -n '2,5p' "$0"; exit 2 ;;
+esac

@@ -1,0 +1,9 @@
+{
+    "KPlugin": {
+        "Description": "Tracking speed, scroll speed, inertia and three finger drag",
+        "Icon": "input-touchpad",
+        "Name": "Apple Magic Trackpad"
+    },
+    "X-KDE-Keywords": "trackpad,touchpad,scrolling,inertia,tracking,mac,apple,magic",
+    "X-KDE-System-Settings-Parent-Category": "pointing-devices"
+}

@@ -1,0 +1,30 @@
+{
+  "_comment": "Parametric acceleration curves read from an Apple Silicon Mac (macOS 27) with `ioreg -r -c AppleMultitouchDevice -l` (HIDAccelCurves, HIDScrollAccelCurves), converted from 16.16 fixed point. Each curve is tagged with the System Settings slider value it belongs to (HIDAccelIndex). The settings the Mac was using: tracking speed com.apple.trackpad.scaling = 1.5 (HIDTrackpadAcceleration = 98304), scroll acceleration HIDTrackpadScrollAcceleration = 20480 (0.3125, the default). Resolution: HIDPointerResolution = HIDScrollResolution = 400 dpi.",
+  "resolution_dpi": 400,
+  "pointer_setting": 1.5,
+  "scroll_setting": 0.3125,
+  "pointer": [
+    {"index": 0,   "linear": 65536, "parabolic": 0,      "cubic": 0,     "quartic": 0, "tangent_linear": 484966, "tangent_root": 1376256},
+    {"index": 8192,   "linear": 64881, "parabolic": 32768,  "cubic": 5243,  "quartic": 0, "tangent_linear": 478413, "tangent_root": 1310720},
+    {"index": 32768,  "linear": 64225, "parabolic": 43254,  "cubic": 6554,  "quartic": 0, "tangent_linear": 471859, "tangent_root": 1245184},
+    {"index": 45056,  "linear": 62915, "parabolic": 54395,  "cubic": 7864,  "quartic": 0, "tangent_linear": 465306, "tangent_root": 1179648},
+    {"index": 57344,  "linear": 61604, "parabolic": 65536,  "cubic": 9830,  "quartic": 0, "tangent_linear": 458752, "tangent_root": 1114112},
+    {"index": 65536,  "linear": 60293, "parabolic": 75366,  "cubic": 11796, "quartic": 0, "tangent_linear": 458752, "tangent_root": 1048576},
+    {"index": 98304,  "linear": 58327, "parabolic": 85197,  "cubic": 13763, "quartic": 0, "tangent_linear": 458752, "tangent_root": 983040},
+    {"index": 131072, "linear": 56361, "parabolic": 95027,  "cubic": 15729, "quartic": 0, "tangent_linear": 458752, "tangent_root": 917504},
+    {"index": 163840, "linear": 54395, "parabolic": 108790, "cubic": 18350, "quartic": 0, "tangent_linear": 458752, "tangent_root": 851968},
+    {"index": 196608, "linear": 65536, "parabolic": 123208, "cubic": 23593, "quartic": 0, "tangent_linear": 458752, "tangent_root": 786432}
+  ],
+  "scroll": [
+    {"index": 0,      "linear": 65536, "parabolic": 0,      "cubic": 0, "quartic": 0, "tangent_linear": 393216, "tangent_root": 786432},
+    {"index": 8192,   "linear": 62259, "parabolic": 39322,  "cubic": 0, "quartic": 0, "tangent_linear": 406323, "tangent_root": 786432},
+    {"index": 32768,  "linear": 58982, "parabolic": 58982,  "cubic": 0, "quartic": 0, "tangent_linear": 419430, "tangent_root": 786432},
+    {"index": 45056,  "linear": 55706, "parabolic": 78643,  "cubic": 0, "quartic": 0, "tangent_linear": 432538, "tangent_root": 786432},
+    {"index": 57344,  "linear": 52429, "parabolic": 91750,  "cubic": 0, "quartic": 0, "tangent_linear": 445645, "tangent_root": 786432},
+    {"index": 65536,  "linear": 49152, "parabolic": 104858, "cubic": 0, "quartic": 0, "tangent_linear": 458752, "tangent_root": 786432},
+    {"index": 98304,  "linear": 45875, "parabolic": 117965, "cubic": 0, "quartic": 0, "tangent_linear": 471859, "tangent_root": 786432},
+    {"index": 131072, "linear": 42598, "parabolic": 131072, "cubic": 0, "quartic": 0, "tangent_linear": 484966, "tangent_root": 786432},
+    {"index": 163840, "linear": 39322, "parabolic": 144179, "cubic": 0, "quartic": 0, "tangent_linear": 498074, "tangent_root": 786432},
+    {"index": 196608, "linear": 36045, "parabolic": 157286, "cubic": 0, "quartic": 0, "tangent_linear": 511181, "tangent_root": 786432}
+  ]
+}

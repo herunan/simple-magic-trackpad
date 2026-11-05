@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+"""Mac Trackpad settings: tracking speed, scroll speed and inertia scrolling."""
+import os
+import sys
+
+# The package lives beside this script (also when ~/.local/bin links here).
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+
+from mac_trackpad_settings.main import main  # noqa: E402
+
+sys.exit(main())

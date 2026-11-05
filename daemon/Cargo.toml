@@ -1,0 +1,14 @@
+[package]
+name = "mac-trackpad"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+input-linux = "0.7.1"
+libc = "0.2"
+serde = { version = "1.0.216", features = ["derive"] }
+serde_json = "1.0.133"
+serde_with = "3.14.0"
+tracing-subscriber = { version = "0.3.19", features = ["chrono"] }
+tracing = "0.1.41"
+tokio = { version = "1.47.1", features = ["macros", "rt", "time", "net", "signal"] }

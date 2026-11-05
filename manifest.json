@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.herunan.simple-magic-trackpad",
+  "name": "Simple Magic Trackpad",
+  "version": "0.1.0",
+  "author": "herunan",
+  "license": "MIT",
+  "description": "The macOS trackpad settings for an Apple Magic Trackpad: tracking speed, scroll speed, inertia scrolling and three finger drag. Needs this repository's mac-trackpad daemon and accel tool (see README).",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "omarchy/BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Trackpad",
+    "description": "Magic Trackpad tracking and scroll speed, inertia and three finger drag",
+    "category": "System",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}
