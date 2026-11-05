@@ -51,7 +51,7 @@ s = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox=
 
 # title
 s += [text(90, 170, "simple", 84, FG, 700), text(90, 262, "magic", 84, BLUE, 700), text(90, 354, "trackpad", 84, FG, 700),
-      text(90, 412, "three finger drag and a Mac-matched glide", 25, DIM)]
+      text(90, 412, "Mac-matched glide and three-finger drag", 26, FG)]
 
 # settings panel
 px, py, pw, ph = 90, 480, 620, 420
