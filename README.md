@@ -1,3 +1,5 @@
+![Simple Magic Trackpad: tracking and scroll speed sliders, inertia and three finger drag switches, and two fingers gliding to a stop on a trackpad](preview.png)
+
 # Simple Magic Trackpad
 
 Make the Apple Magic Trackpad 2 behave like it does on a Mac under Linux: three-finger
