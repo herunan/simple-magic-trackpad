@@ -6,6 +6,11 @@ Make the Apple Magic Trackpad 2 behave like it does on a Mac under Linux: three-
 drag, a glide measured against a real Mac, and Mac pointer and scroll curves. Developed
 on KDE Plasma 6.8 (KWin Wayland, libinput 1.32).
 
+It has the same basic settings as a Mac (tracking speed, scroll speed, inertia and three
+finger drag) and is built to match the Magic Trackpad on an Apple device 1:1. The curves
+are read from a real Mac and the glide is measured against one. It isn't exact everywhere
+yet: for example, how far a glide scrolls still depends on each app.
+
 ## Plan and status
 
 | Step | What | Mechanism | Status |
