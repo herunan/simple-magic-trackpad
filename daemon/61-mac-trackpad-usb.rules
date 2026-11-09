@@ -1,0 +1,14 @@
+# Magic Trackpad 2 over USB: switch off USB interface 0.
+#
+# Over USB the pad has two HID interfaces with an input node each. The touch
+# data comes from interface 1; on interface 0 hid-magicmouse can't switch the
+# pad to touch mode ("unable to request touch data (-32)"), and its event
+# node fails every open() with EPIPE. Anything that opens new input devices
+# trips over it: KWin logs "Failed to open ... (Broken pipe)", and Toshy's
+# xwaykeyz retries it for ~50 s per inotify event, one device at a time, so a
+# keyboard plugged in after the trackpad isn't grabbed (no remapping) until
+# Toshy is restarted. Deauthorizing the interface removes that node; the pad
+# keeps working through interface 1. Bluetooth is not affected.
+#
+# Undo for the current connection: echo 1 | sudo tee /sys/bus/usb/devices/<port>:1.0/authorized
+ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_interface", ATTRS{idVendor}=="05ac", ATTRS{idProduct}=="0265", ATTR{bInterfaceNumber}=="00", ATTR{authorized}="0"

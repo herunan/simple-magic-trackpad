@@ -206,6 +206,23 @@ sudo udevadm control --reload-rules
 The daemon needs uinput access for the `input` group, for example through a rule in
 `/etc/udev/rules.d/60-uinput.rules`.
 
+If no touchpad is connected, the daemon exits with status 75. The unit neither restarts
+it nor counts that as a failure; the udev rule starts it again when a touchpad appears.
+(Restarting on a timer used to hit systemd's start limit while the pad was unplugged,
+which then blocked udev's start when it came back.)
+
+**Over USB, also install `61-mac-trackpad-usb.rules`** (optional, but recommended):
+
+```sh
+sudo cp daemon/61-mac-trackpad-usb.rules /etc/udev/rules.d/ && sudo udevadm control --reload-rules
+```
+
+Over USB the pad has a second input node (interface 0) that fails every open with
+"Broken pipe"; the touches come from interface 1. Programs that open new input devices
+trip over it: Toshy's keymapper retries it for about 50 s per event, so a keyboard that
+reconnects after the trackpad isn't remapped until Toshy is restarted. The rule switches
+that interface off; Bluetooth is not affected.
+
 ## Settings app (`app/`)
 
 "Apple Magic Trackpad", a small app (Python 3 + PyQt6 + Qt Quick Controls, no KDE libraries) with
