@@ -11,6 +11,11 @@ Type=exec
 ExecStart=%h/.local/bin/mac-trackpad
 Restart=on-failure
 RestartSec=1
+# 75 = no touchpad present: not a failure, and not restarted on a timer
+# (that used up the start limit and then blocked udev's start when the
+# pad came back). 99-mac-trackpad.rules starts it when one appears.
+SuccessExitStatus=75
+RestartPreventExitStatus=75
 
 [Install]
 WantedBy=graphical-session.target

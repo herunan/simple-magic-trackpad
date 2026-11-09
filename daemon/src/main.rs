@@ -22,6 +22,13 @@ const CFG_POLL: Duration = Duration::from_secs(2);
 /// giving up and letting the service manager restart us.
 const REDISCOVER_ATTEMPTS: u32 = 60;
 const REDISCOVER_BACKOFF: Duration = Duration::from_millis(500);
+/// Exit status for "no touchpad here (yet)". The unit doesn't restart on
+/// it (RestartPreventExitStatus) and doesn't count it as a failure;
+/// 99-mac-trackpad.rules starts the service again when a touchpad
+/// appears. Restarting on a timer instead burned through systemd's start
+/// limit while the pad was unplugged, which then blocked udev's start
+/// when it came back, leaving the pad without the daemon until login.
+const EXIT_NO_TOUCHPAD: i32 = 75; // EX_TEMPFAIL
 
 struct Args {
     /// Explicit touchpad device path (skips discovery). Mainly for the
@@ -104,6 +111,23 @@ async fn main() -> Result<(), io::Error> {
         }
     };
 
+    // Find the touchpad before creating any virtual device, so a start
+    // with no touchpad present leaves no hotplug traces behind.
+    let first_path = match &args.device {
+        Some(p) => p.clone(),
+        None => {
+            info!("Searching for the trackpad on your device...");
+            match discovery::find_real_trackpads() {
+                Ok(paths) => pick_first(paths),
+                Err(e) if e.kind() == io::ErrorKind::NotFound => {
+                    info!("No touchpad yet; exiting until udev starts us when one appears.");
+                    std::process::exit(EXIT_NO_TOUCHPAD);
+                }
+                Err(e) => return Err(e),
+            }
+        }
+    };
+
     let mut vtrackpad = virtual_trackpad::start_handler()?;
     // created only when a wheel-mode glide is configured (now or on a
     // reload), then kept until exit
@@ -112,7 +136,7 @@ async fn main() -> Result<(), io::Error> {
     // run() holds the real event loop; wrapping it like this guarantees
     // the virtual devices are destroyed on the way out no matter how it
     // returns (including the button being released if a drag was live).
-    let result = run(&args, configs, &mut vtrackpad, &mut wheel).await;
+    let result = run(&args, first_path, configs, &mut vtrackpad, &mut wheel).await;
 
     info!("Cleaning up and exiting...");
     vtrackpad.mouse_up()?; // just in case a drag was in flight
@@ -121,7 +145,24 @@ async fn main() -> Result<(), io::Error> {
         w.destruct()?;
     }
     info!("Clean up successful.");
-    result
+    match result {
+        Err(e) if e.kind() == io::ErrorKind::NotFound && args.device.is_none() => {
+            warn!("{e}; exiting until udev starts us when a touchpad appears.");
+            std::process::exit(EXIT_NO_TOUCHPAD);
+        }
+        other => other,
+    }
+}
+
+fn pick_first(paths: Vec<String>) -> String {
+    if paths.len() > 1 {
+        warn!(
+            "Found {} touchpads; only proxying the first one ({}).",
+            paths.len(),
+            paths[0]
+        );
+    }
+    paths[0].clone()
 }
 
 /// Creates the momentum wheel device if the configuration wants it and
@@ -141,6 +182,7 @@ fn ensure_wheel(cfg: &config::Configuration, wheel: &mut Option<VirtualWheel>) {
 
 async fn run(
     args: &Args,
+    first_path: String,
     mut cfg: config::Configuration,
     vtp: &mut virtual_trackpad::VirtualTrackpad,
     wheel: &mut Option<VirtualWheel>,
@@ -156,20 +198,14 @@ async fn run(
 
     // Outer loop: one iteration per (re)acquired touchpad. Re-entered
     // only if the device disappears (ENODEV) and rediscovery succeeds.
+    let mut next_path = Some(first_path);
     'device: loop {
-        let path = match &args.device {
-            Some(p) => p.clone(),
-            None => {
+        let path = match (next_path.take(), &args.device) {
+            (Some(p), _) => p,
+            (None, Some(p)) => p.clone(),
+            (None, None) => {
                 info!("Searching for the trackpad on your device...");
-                let paths = discovery::find_real_trackpads()?;
-                if paths.len() > 1 {
-                    warn!(
-                        "Found {} touchpads; only proxying the first one ({}).",
-                        paths.len(),
-                        paths[0]
-                    );
-                }
-                paths[0].clone()
+                pick_first(discovery::find_real_trackpads()?)
             }
         };
 
@@ -249,6 +285,7 @@ async fn run(
             match discovery::find_real_trackpads() {
                 Ok(paths) if !paths.is_empty() => {
                     debug!("Touchpad back after {attempt} attempt(s).");
+                    next_path = Some(pick_first(paths));
                     continue 'device;
                 }
                 _ => {}
